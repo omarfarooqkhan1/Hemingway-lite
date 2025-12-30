@@ -33,11 +33,7 @@ A minimalist writing application inspired by the Hemingway Editor, designed to h
 
 ### Development Setup
 
-1. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   cd hemingway-lite
-   ```
+1. Clone the repository.
 
 2. Install dependencies:
    ```bash
