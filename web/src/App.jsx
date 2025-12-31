@@ -49,13 +49,6 @@ function App() {
     localStorage.removeItem('hemingway-lite-text');
   };
 
-  const handleManualSave = () => {
-    // Manually save the current text to localStorage
-    localStorage.setItem('hemingway-lite-text', text);
-    // Show a confirmation message
-    alert('Document saved to browser storage!');
-  };
-
   const handleSaveToFile = async () => {
     if (!isElectron) {
       // For web version, just trigger the download
@@ -141,7 +134,6 @@ function App() {
       <header className="top-bar">
         <div className="left">
           <button onClick={handleNew}>New</button>
-          <button onClick={handleManualSave}>Save Now</button>
           <button onClick={handleOpen}>Open</button>
           <button onClick={handleSaveToFile}>Save</button>
           <button onClick={handleSaveAs}>Save As</button>
