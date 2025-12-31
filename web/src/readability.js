@@ -3,11 +3,16 @@ import readability from "text-readability";
 export function analyzeText(text) {
   const clean = text || "";
   let grade = "—";
-  try {
-    grade = readability.textStandard(clean);
-  } catch (e) {
-    grade = "—";
+  
+  // Only calculate grade if there's text to analyze
+  if (clean.trim()) {
+    try {
+      grade = readability.textStandard(clean);
+    } catch (e) {
+      grade = "—";
+    }
   }
+  
   const wordCount = readability.lexiconCount(clean, true);
   const charCount = readability.charCount(clean, true);
   const wordsPerMinute = 200;
