@@ -71,3 +71,15 @@ ipcMain.handle("file:saveAs", async (_event, { content, defaultPath }) => {
   fs.writeFileSync(filePath, content, "utf8");
   return filePath;
 });
+
+ipcMain.handle("file:save", async (_event, { content, filePath }) => {
+  if (!filePath) return null;
+
+  try {
+    fs.writeFileSync(filePath, content, "utf8");
+    return filePath;
+  } catch (error) {
+    console.error("Error saving file:", error);
+    return null;
+  }
+});

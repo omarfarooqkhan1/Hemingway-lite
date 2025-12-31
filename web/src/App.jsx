@@ -5,6 +5,7 @@ const isElectron = !!window.api;
 
 function App() {
   const [text, setText] = useState("");
+  const [currentFilePath, setCurrentFilePath] = useState(null); // Track current file path
   const [stats, setStats] = useState({
     grade: "—",
     words: 0,
@@ -55,6 +56,32 @@ function App() {
     alert('Document saved to browser storage!');
   };
 
+  const handleSaveToFile = async () => {
+    if (!isElectron) {
+      // For web version, just trigger the download
+      const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = currentFilePath ? currentFilePath.split('/').pop() : "document.txt";
+      a.click();
+      URL.revokeObjectURL(url);
+      return;
+    }
+    
+    // If we have a current file path, save to that path; otherwise prompt for save as
+    if (currentFilePath) {
+      await window.api.saveFile({ content: text, filePath: currentFilePath });
+      alert(`Saved to: ${currentFilePath}`);
+    } else {
+      const result = await window.api.saveAs({ content: text, defaultPath: "document.txt" });
+      if (result) {
+        setCurrentFilePath(result); // Set the current file path after saving
+        alert(`Saved as: ${result}`);
+      }
+    }
+  };
+
   const handleOpen = async () => {
     if (!isElectron) {
       alert("Open file is only available in the desktop app.");
@@ -63,12 +90,15 @@ function App() {
     const res = await window.api.openFile();
     if (res) {
       setText(res.content);
+      setCurrentFilePath(res.filePath); // Set the current file path
     }
   };
 
-  const handleSave = async () => {
+  // Old save function - removing since we now have specific Save and Save As functions
+
+  const handleSaveAs = async () => {
     if (!isElectron) {
-      // Web: download as .txt
+      // Web: download as .txt (same as before)
       const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -78,7 +108,11 @@ function App() {
       URL.revokeObjectURL(url);
       return;
     }
-    await window.api.saveAs({ content: text, defaultPath: "document.txt" });
+    
+    const result = await window.api.saveAs({ content: text, defaultPath: "document.txt" });
+    if (result) {
+      setCurrentFilePath(result); // Set the current file path after saving
+    }
   };
 
   const handleExportHtml = async () => {
@@ -99,6 +133,7 @@ function App() {
     });
   };
 
+
   const tokens = applyHighlightsToTokens(text, highlights);
 
   return (
@@ -108,7 +143,8 @@ function App() {
           <button onClick={handleNew}>New</button>
           <button onClick={handleManualSave}>Save Now</button>
           <button onClick={handleOpen}>Open</button>
-          <button onClick={handleSave}>Save</button>
+          <button onClick={handleSaveToFile}>Save</button>
+          <button onClick={handleSaveAs}>Save As</button>
           <button onClick={handleExportHtml}>Export HTML</button>
         </div>
         <div className="right">
@@ -138,7 +174,7 @@ function App() {
       </main>
       <footer className="footer">
         <span>
-          Hemingway‑style offline editor • Desktop app has full file access,
+          Hemingway‑style offline editor • Desktop app has full file access (Save/Save As),
           web version keeps everything in your browser. Your work is autosaved every 30 seconds.
         </span>
       </footer>
