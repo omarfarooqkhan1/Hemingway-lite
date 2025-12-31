@@ -3,9 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "main": "electron/main.js",
+  "description": "A minimalist writing application inspired by the Hemingway Editor",
+  "author": "Your Name",
+  "license": "MIT",
   "scripts": {
     "dev": "concurrently \"npm:start:react\" \"npm:start:electron\"",
-    "start:react": "cd web && npm start",
+    "start:react": "cd web && npm run dev",
     "start:electron": "wait-on http://localhost:5173 && cross-env VITE_DEV_SERVER_URL=http://localhost:5173 electron .",
     "build": "cd web && npm run build",
     "dist": "npm run build && electron-builder",
@@ -13,11 +16,11 @@
   },
   "dependencies": {
     "cross-env": "^7.0.3",
-    "electron": "^30.0.0",
     "wait-on": "^7.0.1",
     "concurrently": "^9.0.0"
   },
   "devDependencies": {
+    "electron": "^30.0.0",
     "electron-builder": "^24.13.3"
   },
   "build": {

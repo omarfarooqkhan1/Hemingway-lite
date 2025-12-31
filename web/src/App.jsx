@@ -13,6 +13,24 @@ function App() {
   });
   const [highlights, setHighlights] = useState([]);
 
+  // Load text from localStorage on initial render
+  useEffect(() => {
+    const savedText = localStorage.getItem('hemingway-lite-text');
+    if (savedText) {
+      setText(savedText);
+    }
+  }, []);
+
+  // Autosave text to localStorage every 30 seconds
+  useEffect(() => {
+    const autosaveInterval = setInterval(() => {
+      localStorage.setItem('hemingway-lite-text', text);
+    }, 30000); // 30 seconds
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(autosaveInterval);
+  }, [text]);
+
   useEffect(() => {
     const s = analyzeText(text);
     setStats({
@@ -26,6 +44,15 @@ function App() {
 
   const handleNew = () => {
     setText("");
+    // Clear autosaved text from localStorage
+    localStorage.removeItem('hemingway-lite-text');
+  };
+
+  const handleManualSave = () => {
+    // Manually save the current text to localStorage
+    localStorage.setItem('hemingway-lite-text', text);
+    // Show a confirmation message
+    alert('Document saved to browser storage!');
   };
 
   const handleOpen = async () => {
@@ -79,6 +106,7 @@ function App() {
       <header className="top-bar">
         <div className="left">
           <button onClick={handleNew}>New</button>
+          <button onClick={handleManualSave}>Save Now</button>
           <button onClick={handleOpen}>Open</button>
           <button onClick={handleSave}>Save</button>
           <button onClick={handleExportHtml}>Export HTML</button>
@@ -111,7 +139,7 @@ function App() {
       <footer className="footer">
         <span>
           Hemingway‑style offline editor • Desktop app has full file access,
-          web version keeps everything in your browser.
+          web version keeps everything in your browser. Your work is autosaved every 30 seconds.
         </span>
       </footer>
     </div>
